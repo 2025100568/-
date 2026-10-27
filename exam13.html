@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script>
+    let number = prompt('점수를 입력하세요.');
+   /* if( number % 2 == 0 ){
+     alert('짝수 입니다.');
+    }
+   else { 
+    alert('홀수 입니다.');
+    }
+    /* if ( number >= 90 ) {
+       alert ('A 입니다.');
+         80<= number 90 복합 조건 쓰지 않는 것 유의
+     } else if ( number >= 80 && number < 90 ) { 단독 조건일 경우 범위 제한 필요, but 중첩일 경우 굳이 범위 제한 x
+        alert ('B 입니다.');
+    } else if ( numer >= 70 ); {
+        alert ('C 입니다.'); 
+    } else if ( number >= 60 ); {
+        alert ('D 입니다.'); 
+    } else ( ); {
+        alert ('F 입니다.'); 
+    } 
+
+     let number = prompt ('점수를 입력하세요.');
+    switch (parseInt(number/10)) {
+        case 9:
+            alert ('A 입니다.');
+            break;
+        case 8:
+            alert ('B 입니다.');
+            break
+        case 7:
+            alert ('C 입니다.');
+            break
+        case 6:
+            alert ('D 입니다.');
+            break
+        default:
+            alert ('F 입니다.');
+    } */
+    /* switch (true) {
+        case number >= 90:
+         순서 주의
+        case number >= 80:
+
+        case number >= 70:
+    } */
+</script>
+<body>
+    <h1> JS조건문 </h1>
+    <hr>
+    <h1>JS 반복문</h1>
+    <script>
+       /* let num = 1;
+        while( num <= number ){
+           document.write( num+'<br>');
+           num++; /* 명확한 규칙성이 없는 반복도 가능 (조건이 참이면 됨) -> for는 몇 번 반복하는지 모르는 경우 o
+        }
+        for ( num = 1; num <= number; num++ ) {
+            document.write( num+'<br>');
+        } */
+
+        let sum = 0;
+        let i = 1;
+        for( i = 1; i < number; i++ ) {
+            sum = sum + i;
+        }
+        document.write( sum+'<br>' );
+    </script>
+</body>
+</html>
