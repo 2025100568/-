@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수야와 수호의 졸업 학점 계산기</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        margin: 0; padding: 24px 12px; min-height: 100vh;
+        background: linear-gradient(135deg, #eaf6ff, #f8fbff);
+        font-family: "Malgun Gothic", Arial, sans-serif; color: #183b59;
+    }
+    #calc {
+        width: 100%; max-width: 430px; margin: 0 auto; padding: 22px;
+        background: white; border: 2px solid #c8e5f8; border-radius: 26px;
+        box-shadow: 0 12px 32px rgba(35, 111, 160, .13);
+    }
+    h1 { margin: 0; text-align: center; color: #147db8; font-size: 25px; }
+    .subtitle { text-align: center; color: #6b8ba3; font-size: 12px; margin: 7px 0 18px; letter-spacing: 1px; }
+    .mascots { display: flex; justify-content: center; align-items: end; gap: 18px; margin-bottom: 14px; }
+    .mascots img { height: 112px; max-width: 43%; object-fit: contain; }
+    .screen {
+        background: #edf7fd; border: 1px solid #c7e4f5; border-radius: 15px;
+        padding: 13px 16px; margin-bottom: 14px;
+    }
+    .screen-label { color: #5e829d; font-size: 12px; }
+    #display { width: 100%; border: 0; outline: 0; background: transparent; text-align: right;
+        color: #164e75; font-size: 30px; font-weight: bold; padding: 8px 0 0; }
+    #display[readonly] { cursor: default; }
+    .selected-name { font-weight: bold; color: #147db8; margin: 12px 0 8px; }
+    .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 13px; }
+    button { font-family: inherit; cursor: pointer; border: 0; border-radius: 11px; font-weight: bold; }
+    .category {
+        background: #eaf5fc; color: #28658b; padding: 12px 6px; border: 1px solid #d2e9f7;
+    }
+    .category.active { background: #147db8; color: white; border-color: #147db8; }
+    .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .key { background: #f1f6fa; color: #244c68; padding: 15px 4px; font-size: 19px; }
+    .key:active, .category:active, .action:active { transform: scale(.97); }
+    .key.utility { background: #dceefa; color: #176b9d; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .action { padding: 14px 5px; font-size: 15px; }
+    #save { background: #4c9dca; color: white; }
+    #calculate { background: #126fa8; color: white; }
+    #reset { background: #eef3f7; color: #547187; }
+    .saved { margin-top: 18px; background: #f8fbfd; border-radius: 15px; padding: 14px; }
+    .saved h2, .result h2 { margin: 0 0 10px; font-size: 16px; color: #176b9d; }
+    .credit-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #e5eef4; font-size: 13px; }
+    .credit-row:last-child { border-bottom: 0; }
+    .result { display: none; margin-top: 14px; padding: 15px; border-radius: 15px; background: #f0f8fd; }
+    #status { font-size: 19px; font-weight: bold; margin-bottom: 8px; }
+    #guidance { font-size: 13px; line-height: 1.7; white-space: pre-line; }
+    .notice { margin: 14px 2px 0; color: #7891a3; font-size: 11px; line-height: 1.6; }
+    .mascot-message { display:flex; align-items:center; gap:10px; margin-top:13px; color:#376783; font-size:12px; line-height:1.5; }
+    .mascot-message img { width:54px; height:62px; object-fit:contain; }
+</style>
+</head>
+<body>
+<div id="calc">
+    <h1>수야와 수호의 졸업 계산기</h1>
+    <div class="subtitle">SUYA & SUHO · GRADUATION CALCULATOR</div>
+
+    <div class="mascots">
+        <img src="https://www.syu.ac.kr/wp-content/uploads/2023/03/suya_.png" alt="삼육대학교 공식 캐릭터 수야">
+        <img src="https://www.syu.ac.kr/wp-content/uploads/2023/03/suho_.png" alt="삼육대학교 공식 캐릭터 수호">
+    </div>
+
+    <div class="screen">
+        <div class="screen-label">선택 항목 / 입력 학점</div>
+        <div class="selected-name" id="selectedName">교양필수</div>
+        <input type="text" id="display" value="0" readonly>
+    </div>
+
+    <div class="category-grid">
+        <button class="category active" data-category="교양필수">교양필수</button>
+        <button class="category" data-category="영역별 교양">영역별 교양</button>
+        <button class="category" data-category="전공">전공</button>
+        <button class="category" data-category="자유선택">자유선택</button>
+    </div>
+
+    <div class="keypad">
+        <button class="key num" value="7">7</button>
+        <button class="key num" value="8">8</button>
+        <button class="key num" value="9">9</button>
+        <button class="key utility" id="clearEntry">AC</button>
+        <button class="key num" value="4">4</button>
+        <button class="key num" value="5">5</button>
+        <button class="key num" value="6">6</button>
+        <button class="key utility" id="backspace">⌫</button>
+        <button class="key num" value="1">1</button>
+        <button class="key num" value="2">2</button>
+        <button class="key num" value="3">3</button>
+        <button class="key utility num" value="0">0</button>
+    </div>
+
+    <div class="actions">
+        <button class="action" id="save">학점 저장</button>
+        <button class="action" id="calculate">졸업 계산 =</button>
+        <button class="action" id="reset">전체 초기화</button>
+        <button class="action" id="showSaved">입력 학점 확인</button>
+    </div>
+
+    <div class="saved" id="savedArea">
+        <h2>나의 이수 학점</h2>
+        <div class="credit-row"><span>교양필수</span><strong id="v-core">0학점</strong></div>
+        <div class="credit-row"><span>영역별 교양</span><strong id="v-liberal">0학점</strong></div>
+        <div class="credit-row"><span>전공</span><strong id="v-major">0학점</strong></div>
+        <div class="credit-row"><span>자유선택</span><strong id="v-free">0학점</strong></div>
+        <div class="credit-row"><strong>총 이수 학점</strong><strong id="v-total">0학점</strong></div>
+    </div>
+
+    <div class="result" id="result">
+        <h2>졸업 요건 진단 결과</h2>
+        <div id="status"></div>
+        <div id="guidance"></div>
+        <div class="mascot-message">
+            <div id="mascotText">차근차근 학점을 확인해 보자!</div>
+        </div>
+    </div>
+
+    <p class="notice">
+        ※ 기본 입력 기준: 졸업 총 140학점, 교양필수 24학점, 영역별 교양 15학점, 전공 73학점.
+        자유선택은 별도 최소 기준을 두지 않고 총 이수 학점에 합산합니다.
+        학교의 실제 졸업사정 결과와 다를 수 있으므로 최신 학사 안내 및 학부 확인이 필요합니다.
+    </p>
+</div>
+
+<script>
+$(document).ready(function() {
+    // 졸업 기준 학점
+    let requirements = {
+        "교양필수": 24,
+        "영역별 교양": 15,
+        "전공": 73,
+        "자유선택": 0
+    };
+
+    // 항목별 입력 학점 저장
+    let credits = {
+        "교양필수": 0,
+        "영역별 교양": 0,
+        "전공": 0,
+        "자유선택": 0
+    };
+
+    let selected = "교양필수";
+
+    // 학점 항목 선택
+    $(".category").click(function() {
+        selected = $(this).attr("data-category");
+        $(".category").removeClass("active");
+        $(this).addClass("active");
+        $("#selectedName").text(selected);
+        $("#display").val("0");
+    });
+
+    // 숫자 버튼 입력
+    $(".num").click(function() {
+        let cur = $("#display").val();
+        let n = $(this).val();
+
+        if(cur == "0") {
+            $("#display").val(n);
+        } else if(cur.length < 4) {
+            $("#display").val(cur + n);
+        }
+    });
+
+    // 현재 입력값만 초기화
+    $("#clearEntry").click(function() {
+        $("#display").val("0");
+    });
+
+    // 마지막 숫자 한 자리 삭제
+    $("#backspace").click(function() {
+        let cur = $("#display").val();
+        if(cur.length <= 1) {
+            $("#display").val("0");
+        } else {
+            $("#display").val(cur.slice(0, -1));
+        }
+    });
+
+    // 선택한 항목에 학점 저장
+    $("#save").click(function() {
+        let value = Number($("#display").val());
+
+        if(value < 0) {
+            alert("0 이상의 학점을 입력해 주세요.");
+            return;
+        }
+
+        credits[selected] = value;
+        updateCredits();
+        $("#result").hide();
+        alert(selected + " " + value + "학점을 저장했어!");
+        $("#display").val("0");
+    });
+
+    // 화면에 저장된 학점 표시
+    function updateCredits() {
+        $("#v-core").text(credits["교양필수"] + "학점");
+        $("#v-liberal").text(credits["영역별 교양"] + "학점");
+        $("#v-major").text(credits["전공"] + "학점");
+        $("#v-free").text(credits["자유선택"] + "학점");
+
+        let total = credits["교양필수"] + credits["영역별 교양"]
+                  + credits["전공"] + credits["자유선택"];
+        $("#v-total").text(total + "학점");
+    }
+
+    // 졸업 요건 계산
+    $("#calculate").click(function() {
+        let total = credits["교양필수"] + credits["영역별 교양"]
+                  + credits["전공"] + credits["자유선택"];
+
+        let missing = [];
+        let coreShort = requirements["교양필수"] - credits["교양필수"];
+        let liberalShort = requirements["영역별 교양"] - credits["영역별 교양"];
+        let majorShort = requirements["전공"] - credits["전공"];
+        let totalShort = 140 - total;
+
+        if(coreShort > 0) {
+            missing.push("• 교양필수: " + coreShort + "학점 부족 → 교양필수 과목 추가 이수");
+        }
+        if(liberalShort > 0) {
+            missing.push("• 영역별 교양: " + liberalShort + "학점 부족 → 부족한 교양 영역의 과목 이수");
+        }
+        if(majorShort > 0) {
+            missing.push("• 전공: " + majorShort + "학점 부족 → 인공지능융합학부 전공 과목 추가 이수");
+        }
+        if(totalShort > 0) {
+            missing.push("• 총 이수 학점: " + totalShort + "학점 부족 → 졸업 총학점까지 추가 이수");
+        }
+
+        $("#result").show();
+
+        if(missing.length == 0) {
+            $("#status").text("졸업 학점 기준 충족!");
+            $("#status").css("color", "#16834b");
+            $("#guidance").text("입력한 학점이 설정된 영역별 기준과 총 졸업 학점을 모두 충족했어.\n단, 실제 졸업 여부는 별도의 필수 교과목 및 기타 졸업 요건 확인이 필요해.");
+            $("#mascotText").text("축하해! 졸업 학점 기준을 모두 채웠어!");
+        } else {
+            $("#status").text("졸업 학점 기준 미충족");
+            $("#status").css("color", "#c47b25");
+            $("#guidance").text("아래 항목을 추가로 이수해야 해.\n\n" + missing.join("\n"));
+            $("#mascotText").text("조금만 더 힘내자! 부족한 학점을 확인하고 계획을 세워 보자.");
+        }
+    });
+
+    // 전체 입력 학점 초기화
+    $("#reset").click(function() {
+        if(confirm("저장된 학점을 모두 초기화할까?")) {
+            credits = {
+                "교양필수": 0,
+                "영역별 교양": 0,
+                "전공": 0,
+                "자유선택": 0
+            };
+            $("#display").val("0");
+            $("#result").hide();
+            updateCredits();
+        }
+    });
+
+    $("#showSaved").click(function() {
+        $("#savedArea").show();
+    });
+});
+</script>
+</body>
+</html>

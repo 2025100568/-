@@ -14,26 +14,59 @@
 </style>
 <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 <script>
-    $(document).ready(function(){
-        $(".num").click(function(){
-            let cur = $("#disp2").val();
-            let n = $(this).val();
-            $("#disp2").val(cur+n);
-        });
-        $(".op").click(function(){
-            let cur = $("#disp2").val();
-            let n = $(this).val();
-            if(n!="=") {
-                $("#disp2").val(cur+n);
-            }
-            else {
-                let result = eval(cur);
-                $("#disp1").val(cur);
-                $("#disp2").val(result);
+   $(document).ready(function(){
 
-            }
-        });
+    let operate = "";
+    let num1 = 0;
+    let num2 = 0;
+    
+    $(".num").click(function(){
+        let cur = $("#disp2").val();
+        let n = $(this).val();
+        $("#disp2").val(cur + n);
     });
+
+    $(".op").click(function(){
+        let cur = $("#disp2").val();
+        let n = $(this).val();
+        if(n != "=") {
+            num1 = Number(cur);
+            operate = n;
+            $("#disp2").val(cur + n);
+        }
+        else {
+            let result = 0;
+
+            let result2 = cur.split(operate);
+            num2 = Number(result2[1]);
+
+
+            if(operate == "+") {
+                result = num1 + num2;
+            }
+            else if(operate == "-") {
+                result = num1 - num2;
+            }
+            else if(operate == "*") {
+                result = num1 * num2;
+            }
+            else if(operator == "/") {
+                result = num1 / num2;
+            }    
+
+            $("#disp1").val(result);
+            $("#disp2").val("");
+            operate = "";
+        }
+    });
+    $(".func").click(function(){
+        num1 = 0;
+        num2 = 0;
+        operate = "";
+        $("#disp1").val("");
+        $("#disp2").val("");
+    });
+});
 </script>
 <body>
     <h1> 계산기 </h1>
@@ -54,14 +87,6 @@
         <input type="button" class="num" value="2">
         <input type="button" class="num" value="3">
         <input type="button" class="op" value="*"><br>
-        <input type="button" class="num" value="7">
-        <input type="button" class="num" value="8">
-        <input type="button" class="num" value="9">
-        <input type="button" class="op" value="+"><br>
-        <input type="button" class="num" value="7">
-        <input type="button" class="num" value="8">
-        <input type="button" class="num" value="9">
-        <input type="button" class="op" value="+"><br>
         <input type="button" class="func" value="ac">
         <input type="button" class="num" value="0">
         <input type="button" class="op" value="=">
